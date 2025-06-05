@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variáveis de cor personalizadas (para fallback ou uso via CSS) */
+:root {
+  --color-background: #f5f5f5; /* light */
+  --color-foreground: #1c1c1e; /* neutral escuro */
+  --color-primary: #2d6a4f; /* verde musgo */
+  --color-secondary: #f4a261; /* laranja queimado */
+  --color-accent: #e76f51; /* vermelho terroso */
+
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Poppins", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1c1c1e;
+    --color-foreground: #f5f5f5;
+  }
+}
+
+/* Estilo base do body */
+body {
+  @apply bg-light text-neutral font-sans;
+}
+
+/* Correção para inputs e botões nativos */
+button,
+input,
+select,
+textarea {
+  @apply focus:outline-none;
+}
