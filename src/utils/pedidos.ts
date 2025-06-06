@@ -1,4 +1,4 @@
-import { ItemCarrinho } from "@/hooks/useCarrinho";
+import type { ItemCarrinho } from "@/hooks/useCarrinho";
 
 export interface Pedido {
   id: string;

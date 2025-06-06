@@ -1,12 +1,15 @@
+"use client";
+
 export default function Loading() {
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen text-primary gap-4"
+    <section
+      className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-primary gap-4 text-center"
       role="status"
       aria-live="polite"
     >
+      {/* Spinner acessível */}
       <svg
-        className="animate-spin h-8 w-8 text-primary"
+        className="h-10 w-10 animate-spin text-primary"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -26,7 +29,11 @@ export default function Loading() {
           d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
         />
       </svg>
-      <span className="text-base font-medium animate-pulse">Carregando...</span>
-    </div>
+
+      {/* Mensagem coerente com tom do projeto */}
+      <p className="text-sm sm:text-base font-medium text-neutral-700 animate-pulse">
+        Carregando os dados... aguarde um instante.
+      </p>
+    </section>
   );
 }

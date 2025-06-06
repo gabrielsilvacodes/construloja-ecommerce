@@ -27,26 +27,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Carregando autenticação
   const router = useRouter();
 
-  // Verifica se há usuário logado no Firebase
+  // 🔐 Escuta mudanças de autenticação do Firebase
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser: User | null) => {
-        if (firebaseUser) {
-          setUser(firebaseUser.email ?? null);
+        if (firebaseUser?.email) {
+          setUser(firebaseUser.email);
         } else {
           setUser(null);
         }
-        setLoading(false);
+        setLoading(false); // Finaliza carregamento, mesmo sem usuário
       }
     );
 
     return () => unsubscribe();
   }, []);
 
+  // 🔑 Função de login
   const login = async (email: string, senha: string): Promise<boolean> => {
     try {
       await signInWithEmailAndPassword(auth, email, senha);
@@ -57,11 +58,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // 🚪 Função de logout
   const logout = () => {
     signOut(auth)
       .then(() => {
         setUser(null);
-        router.push("/");
+        router.push("/"); // Volta para a home após logout
       })
       .catch((error) => {
         console.error("Erro ao sair:", error);
@@ -70,11 +72,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {/* Só renderiza filhos após loading = false */}
       {children}
     </AuthContext.Provider>
   );
 };
 
+// 🔁 Hook personalizado para usar o contexto com segurança
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

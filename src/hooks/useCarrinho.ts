@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+// Tipo de item no carrinho
 export interface ItemCarrinho {
   id: number;
   title: string;
@@ -13,10 +14,8 @@ export interface ItemCarrinho {
 export function useCarrinho() {
   const [itens, setItens] = useState<ItemCarrinho[]>([]);
 
-  // ✅ Carrega do localStorage com fallback e proteção SSR
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
+  // 🧠 Função para carregar carrinho do localStorage
+  const carregarCarrinho = () => {
     try {
       const data = localStorage.getItem("carrinho");
       if (data) {
@@ -26,21 +25,29 @@ export function useCarrinho() {
         }
       }
     } catch (error) {
-      console.warn("Erro ao carregar carrinho:", error);
+      console.error("[Carrinho] Erro ao carregar do localStorage:", error);
+    }
+  };
+
+  // ⏬ Carregar ao montar (somente client-side)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      carregarCarrinho();
     }
   }, []);
 
-  // 💾 Salva no localStorage sempre que mudar
+  // ⏫ Salvar ao mudar
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("carrinho", JSON.stringify(itens));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("carrinho", JSON.stringify(itens));
+    }
   }, [itens]);
 
-  // ➕ Adiciona item ao carrinho
+  // ➕ Adicionar produto
   const adicionar = (item: Omit<ItemCarrinho, "quantity">) => {
     setItens((prev) => {
-      const existe = prev.find((i) => i.id === item.id);
-      if (existe) {
+      const existente = prev.find((i) => i.id === item.id);
+      if (existente) {
         return prev.map((i) =>
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
         );
@@ -49,26 +56,25 @@ export function useCarrinho() {
     });
   };
 
-  // ❌ Remove item do carrinho
+  // ❌ Remover produto
   const remover = (id: number) => {
     setItens((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // 🔁 Altera quantidade de um item
+  // 🔁 Atualizar quantidade
   const alterarQuantidade = (id: number, quantidade: number) => {
+    if (quantidade <= 0) return remover(id);
     setItens((prev) =>
-      quantidade <= 0
-        ? prev.filter((i) => i.id !== id)
-        : prev.map((i) => (i.id === id ? { ...i, quantity: quantidade } : i))
+      prev.map((i) => (i.id === id ? { ...i, quantity: quantidade } : i))
     );
   };
 
-  // 🧹 Limpa carrinho
+  // 🧹 Limpar carrinho
   const limpar = () => setItens([]);
 
-  // 💲 Total calculado
+  // 💰 Total calculado
   const total = itens.reduce(
-    (soma, item) => soma + item.price * item.quantity,
+    (acc, item) => acc + item.price * item.quantity,
     0
   );
 
